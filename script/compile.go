@@ -29,7 +29,13 @@ func init() {
     // globals[2] --> y
     symbols.Define("y")
 
-    // globals[3] --> ctx
+    // globals[3] --> i64
+    symbols.Define("i64")
+
+    // globals[3] --> f64
+    symbols.Define("f64")
+
+    // globals[5] --> ctx
     symbols.Define("ctx")
 }
 

@@ -24,13 +24,9 @@ if !ctx.r {
     ctx.b = pixel[2]
 }
 
-pixel[0] = max(pixel[0], pixel[1])
-pixel[1] = max(pixel[1], pixel[2])
-pixel[2] = max(pixel[2], pixel[0])
-
-pixel[0] *= ctx.r
-pixel[1] *= ctx.g
-pixel[2] = (ctx.b - (ctx.r|ctx.g)) * pixel[2]
+pixel[0] = x & i64(1.5*f64(max(pixel[0], pixel[1]) - ctx.r))
+pixel[1] = y & i64(1.5*f64(max(pixel[1], pixel[2]) - ctx.g))
+pixel[2] = x & i64(1.5*f64(max(pixel[2], pixel[0]) - ctx.b))
 `
 
 func main() {

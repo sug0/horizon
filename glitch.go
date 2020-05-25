@@ -33,7 +33,14 @@ func Glitch(s *script.Script, mat gocv.Mat) (glitched gocv.Mat, err error) {
     persistent := tengo.Map{
         Value: make(map[string]tengo.Object),
     }
-    vm := s.BootstrapVM(&pixel, &coords[0], &coords[1], &persistent)
+    vm := s.BootstrapVM(
+        &pixel,
+        &coords[0],
+        &coords[1],
+        &convI64{},
+        &convF64{},
+        &persistent,
+    )
     for i := 0; i < len(bitmapMat); i += 3 {
         // set pixel value
         setPixel(&pixel, 0, int64(bitmapMat[i+0]))
