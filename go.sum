@@ -1,3 +1,4 @@
-github.com/d5/tengo v1.24.8 h1:PRJ+NWt7ae/9sSbIfThOBTkPSvNV+dwYoBAvwfNgNJY=
 github.com/d5/tengo/v2 v2.4.2 h1:Sj+v0CS8jtrZrXyJLzWof6QTnE6S5k3tYP0y6YVPGkw=
 github.com/d5/tengo/v2 v2.4.2/go.mod h1:XRGjEs5I9jYIKTxly6HCF8oiiilk5E/RYXOZ5b0DZC8=
+github.com/sug0/lilliput v0.0.0-20200525063604-8165bcb355ad h1:jLuIo6UsJUIvpubgcvBbyu/Z8+cGgI/IRqXGr95Z9uQ=
+github.com/sug0/lilliput v0.0.0-20200525063604-8165bcb355ad/go.mod h1:EGyV1aFahgMP0OlTZyYa6LVd8a2VgeZFyAOpLTTpgNM=
