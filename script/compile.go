@@ -32,7 +32,7 @@ func init() {
     // globals[3] --> i64
     symbols.Define("i64")
 
-    // globals[3] --> f64
+    // globals[4] --> f64
     symbols.Define("f64")
 
     // globals[5] --> ctx
