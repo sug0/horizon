@@ -2,6 +2,7 @@ package main
 
 import (
     "os"
+    "fmt"
     "unsafe"
     "strconv"
     "io/ioutil"
@@ -12,7 +13,7 @@ import (
 )
 
 func main() {
-    s, err := script.Compile([]byte(`pixel[0] += 5`))
+    s, err := script.Compile([]byte(`pixel[0] += 5; pixel[1] += 10`))
     if err != nil {
         panic(err)
     }
@@ -33,11 +34,16 @@ func main() {
     if pixtyp.Depth() != 8 {
         panic("unsupported depth: " + strconv.Itoa(pixtyp.Depth()))
     }
-    if pixtyp.Channels() != 3 {
-        panic("unsupported channels: " + strconv.Itoa(pixtyp.Channels()))
+    chans := pixtyp.Channels()
+    if chans < 3 {
+        panic("channel num lower than 3: " + strconv.Itoa(chans))
     }
     framebuf := lilliput.NewFramebuffer(header.Width(), header.Height())
     defer framebuf.Clear()
+    err = decoder.DecodeTo(framebuf)
+    if err != nil {
+        panic(err)
+    }
     bitmap := ((*struct { Buf []byte })(unsafe.Pointer(framebuf))).Buf
     pixel := tengo.Array{
         Value: []tengo.Object{
@@ -47,11 +53,13 @@ func main() {
         },
     }
     vm := s.BootstrapVM(&pixel)
-    for i := 0; i < len(bitmap); i += 3 {
+    fmt.Println(chans)
+    fmt.Println(bitmap)
+    for i := 0; i < len(bitmap); i += chans {
         // set pixel value
-        setPixel(&pixel, 0, bitmap[i+0])
-        setPixel(&pixel, 1, bitmap[i+1])
-        setPixel(&pixel, 2, bitmap[i+2])
+        setPixel(&pixel, 0, int64(bitmap[i+0]))
+        setPixel(&pixel, 1, int64(bitmap[i+1]))
+        setPixel(&pixel, 2, int64(bitmap[i+2]))
 
         // print before
         fmt.Printf("%v --> ", pixel.Value)
