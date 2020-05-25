@@ -49,7 +49,7 @@ func main() {
         setPixel(&pixel, 2, bitmap[i+2])
 
         // print before
-        fmt.Printf("%v --> ", pixel)
+        fmt.Printf("%v --> ", pixel.Value)
 
         // run vm
         err = vm.Run()
@@ -58,7 +58,7 @@ func main() {
         }
 
         // print after
-        fmt.Printf("%v\n", pixel)
+        fmt.Printf("%v\n", pixel.Value)
     }
 }
 
