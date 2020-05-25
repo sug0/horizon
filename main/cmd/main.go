@@ -2,16 +2,39 @@ package main
 
 import (
     "os"
-    "fmt"
     "io/ioutil"
 
     "gocv.io/x/gocv"
-    "github.com/d5/tengo/v2"
+    "github.com/sug0/horizon"
     "github.com/sug0/horizon/script"
 )
 
+const glitchProgram = `
+max := func(x, y) {
+    if x > y {
+        return x
+    }
+    return y
+}
+
+// check if we saved last values
+if !ctx.r {
+    ctx.r = pixel[0]
+    ctx.g = pixel[1]
+    ctx.b = pixel[2]
+}
+
+pixel[0] = max(pixel[0], pixel[1])
+pixel[1] = max(pixel[1], pixel[2])
+pixel[2] = max(pixel[2], pixel[0])
+
+pixel[0] *= ctx.r
+pixel[1] *= ctx.g
+pixel[2] = (ctx.b - (ctx.r|ctx.g)) * pixel[2]
+`
+
 func main() {
-    s, err := script.Compile([]byte(`pixel[0] += 5; pixel[1] += 10`))
+    s, err := script.Compile([]byte(glitchProgram))
     if err != nil {
         panic(err)
     }
@@ -24,36 +47,14 @@ func main() {
         panic(err)
     }
     defer mat.Close()
-    bitmap := mat.DataPtrUint8()
-    pixel := tengo.Array{
-        Value: []tengo.Object{
-            &tengo.Int{},
-            &tengo.Int{},
-            &tengo.Int{},
-        },
+    newmat, err := horizon.Glitch(s, mat)
+    if err != nil {
+        panic(err)
     }
-    vm := s.BootstrapVM(&pixel)
-    for i := 0; i < len(bitmap); i += 3 {
-        // set pixel value
-        setPixel(&pixel, 0, int64(bitmap[i+0]))
-        setPixel(&pixel, 1, int64(bitmap[i+1]))
-        setPixel(&pixel, 2, int64(bitmap[i+2]))
-
-        // print before
-        fmt.Printf("%v --> ", pixel.Value)
-
-        // run vm
-        err = vm.Run()
-        if err != nil {
-            panic(err)
-        }
-
-        // print after
-        fmt.Printf("%v\n", pixel.Value)
+    defer newmat.Close()
+    bufdata, err = gocv.IMEncode(gocv.PNGFileExt, newmat)
+    if err != nil {
+        panic(err)
     }
-}
-
-func setPixel(pixel *tengo.Array, i int, x int64) {
-    v := pixel.Value[i].(*tengo.Int)
-    v.Value = x
+    os.Stdout.Write(bufdata)
 }

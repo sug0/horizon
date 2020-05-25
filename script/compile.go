@@ -22,10 +22,23 @@ func init() {
 
     // globals[0] --> pixel
     symbols.Define("pixel")
+
+    // globals[1] --> x
+    symbols.Define("x")
+
+    // globals[2] --> y
+    symbols.Define("y")
+
+    // globals[3] --> ctx
+    symbols.Define("ctx")
 }
 
 func (s *Script) BootstrapVM(globals ...tengo.Object) *tengo.VM {
-    return tengo.NewVM(s.Bytecode, globals, -1)
+    actualGlobals := make([]tengo.Object, 32)
+    for i := 0; i < len(globals); i++ {
+        actualGlobals[i] = globals[i]
+    }
+    return tengo.NewVM(s.Bytecode, actualGlobals, -1)
 }
 
 func Compile(source []byte) (*Script, error) {
