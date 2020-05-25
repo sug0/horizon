@@ -3,12 +3,10 @@ package main
 import (
     "os"
     "fmt"
-    "unsafe"
-    "strconv"
     "io/ioutil"
 
+    "gocv.io/x/gocv"
     "github.com/d5/tengo/v2"
-    "github.com/sug0/lilliput"
     "github.com/sug0/horizon/script"
 )
 
@@ -21,30 +19,12 @@ func main() {
     if err != nil {
         panic(err)
     }
-    decoder, err := lilliput.NewDecoder(bufdata)
+    mat, err := gocv.IMDecode(bufdata, gocv.IMReadColor)
     if err != nil {
         panic(err)
     }
-    defer decoder.Close()
-    header, err := decoder.Header()
-    if err != nil {
-        panic(err)
-    }
-    pixtyp := header.PixelType()
-    if pixtyp.Depth() != 8 {
-        panic("unsupported depth: " + strconv.Itoa(pixtyp.Depth()))
-    }
-    chans := pixtyp.Channels()
-    if chans < 3 {
-        panic("channel num lower than 3: " + strconv.Itoa(chans))
-    }
-    framebuf := lilliput.NewFramebuffer(header.Width(), header.Height())
-    defer framebuf.Clear()
-    err = decoder.DecodeTo(framebuf)
-    if err != nil {
-        panic(err)
-    }
-    bitmap := ((*struct { Buf []byte })(unsafe.Pointer(framebuf))).Buf
+    defer mat.Close()
+    bitmap := mat.DataPtrUint8()
     pixel := tengo.Array{
         Value: []tengo.Object{
             &tengo.Int{},
@@ -53,9 +33,7 @@ func main() {
         },
     }
     vm := s.BootstrapVM(&pixel)
-    fmt.Println(chans)
-    fmt.Println(bitmap)
-    for i := 0; i < len(bitmap); i += chans {
+    for i := 0; i < len(bitmap); i += 3 {
         // set pixel value
         setPixel(&pixel, 0, int64(bitmap[i+0]))
         setPixel(&pixel, 1, int64(bitmap[i+1]))
