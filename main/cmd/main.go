@@ -2,6 +2,8 @@ package main
 
 import (
     "os"
+    "time"
+    "context"
     "io/ioutil"
 
     "gocv.io/x/gocv"
@@ -43,7 +45,9 @@ func main() {
         panic(err)
     }
     defer mat.Close()
-    newmat, err := horizon.Glitch(s, mat)
+    ctx, cancel := context.WithTimeout(context.Background(), 3 * time.Minute)
+    defer cancel()
+    newmat, err := horizon.Glitch(ctx, s, mat)
     if err != nil {
         panic(err)
     }

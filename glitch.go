@@ -2,6 +2,7 @@ package horizon
 
 import (
     "fmt"
+    "context"
 
     "gocv.io/x/gocv"
     "github.com/d5/tengo/v2"
@@ -12,7 +13,7 @@ var (
     ErrNotRGBImage = fmt.Errorf("horizon: not an rgb image")
 )
 
-func Glitch(s *script.Script, mat gocv.Mat) (glitched gocv.Mat, err error) {
+func Glitch(ctx context.Context, s *script.Script, mat gocv.Mat) (glitched gocv.Mat, err error) {
     if mat.Type() != gocv.MatTypeCV8UC3 {
         err = ErrNotRGBImage
         return
@@ -41,7 +42,8 @@ func Glitch(s *script.Script, mat gocv.Mat) (glitched gocv.Mat, err error) {
         &convF64{},
         &persistent,
     )
-    for i := 0; i < len(bitmapMat); i += 3 {
+    glitchRoundWait := make(chan error)
+    glitchRound := func(i int) {
         // set pixel value
         setPixel(&pixel, 0, int64(bitmapMat[i+0]))
         setPixel(&pixel, 1, int64(bitmapMat[i+1]))
@@ -50,8 +52,7 @@ func Glitch(s *script.Script, mat gocv.Mat) (glitched gocv.Mat, err error) {
         // run vm
         err = vm.Run()
         if err != nil {
-            glitched.Close()
-            err = fmt.Errorf("horizon: vm failed whilst running: %w", err)
+            glitchRoundWait <- err
             return
         }
 
@@ -69,6 +70,24 @@ func Glitch(s *script.Script, mat gocv.Mat) (glitched gocv.Mat, err error) {
         }
         coords[0].Value = x
         coords[1].Value = y
+        glitchRoundWait <- nil
+    }
+    for i := 0; i < len(bitmapMat); i += 3 {
+        go glitchRound(i)
+        select {
+        case err = <-glitchRoundWait:
+            if err != nil {
+                glitched.Close()
+                err = fmt.Errorf("horizon: vm failed whilst running: %w", err)
+                return
+            }
+        case <-ctx.Done():
+            vm.Abort()
+        }
+    }
+    err = ctx.Err()
+    if err != nil {
+        err = fmt.Errorf("horizon: context error: %w", err)
     }
     return
 }
