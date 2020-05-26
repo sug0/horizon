@@ -1,0 +1,23 @@
+math := import("math")
+
+transform := func(ag, xfix, yfix) {
+    fx := f64(x)
+    fy := f64(y)
+    x0 := fx*math.cos(ag) - fy*math.sin(ag)
+    y0 := fx*math.sin(ag) + fy*math.cos(ag)
+    return get_pixel(i64(x0) + xfix, i64(y0) + yfix)
+}
+
+input := get_pixel(x, y)
+t1 := transform(0.432 * math.pi, width/2, -height/2)
+t2 := transform(0.152 * math.pi, width/2, -height/2)
+
+if !ctx.y {
+    ctx.y = 0
+}
+
+output[0] = input[1]-x ^ t2[0] ^ t2[2] &^ ctx.y
+output[1] = input[2]-y ^ t1[1] ^ t2[1] &^ ctx.y
+output[2] = input[0]-x ^ t1[2] ^ t1[0] &^ ctx.y
+
+ctx.y = (output[0]*19595 + output[1]*38470 + output[2]*7471 + 0x8000) >> 24
