@@ -5,6 +5,7 @@ import (
 
     "github.com/d5/tengo/v2"
     "github.com/d5/tengo/v2/parser"
+    "github.com/d5/tengo/v2/stdlib"
 )
 
 type Script struct {
@@ -32,7 +33,7 @@ func Compile(source []byte) (*Script, error) {
         return nil, err
     }
     symbols := buildSymTab()
-    modules := tengo.NewModuleMap()
+    modules := buildModuleMap()
     c := tengo.NewCompiler(srcFile, symbols, nil, modules, nil)
     err = c.Compile(file)
     if err != nil {
@@ -78,4 +79,9 @@ func buildSymTab() (symbols *tengo.SymbolTable) {
     symbols.Define("ctx")
 
     return
+}
+
+func buildModuleMap() *tengo.ModuleMap {
+    modules := tengo.NewModuleMap()
+    modules.AddBuiltinModule("math", stdlib.BuiltinModules["math"])
 }
