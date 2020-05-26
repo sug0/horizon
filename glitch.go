@@ -3,7 +3,6 @@ package horizon
 import (
     "fmt"
     "context"
-    "crypto/subtle"
 
     "gocv.io/x/gocv"
     "github.com/d5/tengo/v2"
@@ -24,7 +23,7 @@ func Glitch(ctx context.Context, s *script.Script, mat gocv.Mat) (glitched gocv.
     glitched = mat.Clone()
     bitmapMat := mat.DataPtrUint8()
     bitmapGlitched := glitched.DataPtrUint8()
-    var x, y int
+    var x, y int64
     var coords [2]tengo.Int
     pixel := tengo.Array{
         Value: []tengo.Object{
@@ -66,9 +65,12 @@ func Glitch(ctx context.Context, s *script.Script, mat gocv.Mat) (glitched gocv.
         bitmapGlitched[i+2] = byte(getPixel(&pixel, 2) & 0xff)
 
         // update coords
-        eq := subtle.ConstantTimeEq(int32(x), int32(width-1))
-        x = subtle.ConstantTimeSelect(eq, 0, x + 1)
-        y = subtle.ConstantTimeSelect(eq, y + 1, y)
+        if x == width-1 {
+            x = 0
+            y++
+        } else {
+            x++
+        }
 
         coords[0].Value = int64(x)
         coords[1].Value = int64(y)
