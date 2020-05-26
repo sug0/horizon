@@ -8,7 +8,6 @@ type builtinGetPixel struct {
     bitmap []byte
 }
 
-
 func (*builtinGetPixel) CanCall() bool {
     return true
 }
