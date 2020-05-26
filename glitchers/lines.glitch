@@ -1,0 +1,12 @@
+math := import("math")
+
+yoff := i64(f64(y) * math.sin(math.exp(f64(y))))
+
+inupt := get_pixel(x, y)
+transform := get_pixel(x, yoff)
+
+for k := 0; k < 3; k++ {
+    t := transform[k]
+    i := inupt[k]
+    output[k] = t == 0 ? i : t
+}
