@@ -84,4 +84,5 @@ func buildSymTab() (symbols *tengo.SymbolTable) {
 func buildModuleMap() *tengo.ModuleMap {
     modules := tengo.NewModuleMap()
     modules.AddBuiltinModule("math", stdlib.BuiltinModules["math"])
+    return modules
 }
