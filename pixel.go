@@ -29,9 +29,10 @@ func (gp *builtinGetPixel) Call(args ...tengo.Object) (tengo.Object, error) {
         if x < 0 || y < 0 || x >= gp.width || y >= gp.height {
             return pixel, nil
         }
-        r.Value = int64(gp.bitmap[3*(y*gp.width+x)+0])
-        g.Value = int64(gp.bitmap[3*(y*gp.width+x)+1])
-        b.Value = int64(gp.bitmap[3*(y*gp.width+x)+2])
+        i := 3 * (y*gp.width + x)
+        r.Value = int64(gp.bitmap[i+0])
+        g.Value = int64(gp.bitmap[i+1])
+        b.Value = int64(gp.bitmap[i+2])
     }
     return pixel, nil
 }
