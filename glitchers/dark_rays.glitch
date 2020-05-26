@@ -1,14 +1,16 @@
+input := get_pixel(x, y)
+
 max := func(x, y) {
     return x > y ? x : y
 }
 
 // check if we saved last values
 if !ctx.r {
-    ctx.r = pixel[0]
-    ctx.g = pixel[1]
-    ctx.b = pixel[2]
+    ctx.r = input[0]
+    ctx.g = input[1]
+    ctx.b = input[2]
 }
 
-pixel[0] = x & i64(1.5*f64(max(pixel[0], pixel[1]) - ctx.r))
-pixel[1] = y & i64(1.5*f64(max(pixel[1], pixel[2]) - ctx.g))
-pixel[2] = x & i64(1.5*f64(max(pixel[2], pixel[0]) - ctx.b))
+output[0] = x & i64(1.5*f64(max(input[0], input[1]) - ctx.r))
+output[1] = y & i64(1.5*f64(max(input[1], input[2]) - ctx.g))
+output[2] = x & i64(1.5*f64(max(input[2], input[0]) - ctx.b))

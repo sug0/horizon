@@ -2,19 +2,19 @@ package horizon
 
 import "github.com/d5/tengo/v2"
 
-type convF64 struct{
+type builtinConvF64 struct {
     tengo.ObjectImpl
 }
 
-type convI64 struct{
+type builtinConvI64 struct {
     tengo.ObjectImpl
 }
 
-func (*convF64) CanCall() bool {
+func (*builtinConvF64) CanCall() bool {
     return true
 }
 
-func (*convF64) Call(args ...tengo.Object) (tengo.Object, error) {
+func (*builtinConvF64) Call(args ...tengo.Object) (tengo.Object, error) {
     f := &tengo.Float{}
     if len(args) < 1 {
         return f, nil
@@ -25,11 +25,11 @@ func (*convF64) Call(args ...tengo.Object) (tengo.Object, error) {
     return f, nil
 }
 
-func (*convI64) CanCall() bool {
+func (*builtinConvI64) CanCall() bool {
     return true
 }
 
-func (*convI64) Call(args ...tengo.Object) (tengo.Object, error) {
+func (*builtinConvI64) Call(args ...tengo.Object) (tengo.Object, error) {
     i := &tengo.Int{}
     if len(args) < 1 {
         return i, nil

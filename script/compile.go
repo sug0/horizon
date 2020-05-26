@@ -20,8 +20,8 @@ func init() {
     symbols = tengo.NewSymbolTable()
     modules = tengo.NewModuleMap()
 
-    // globals[0] --> pixel
-    symbols.Define("pixel")
+    // globals[0] --> output
+    symbols.Define("output")
 
     // globals[1] --> x
     symbols.Define("x")
@@ -35,7 +35,16 @@ func init() {
     // globals[4] --> f64
     symbols.Define("f64")
 
-    // globals[5] --> ctx
+    // globals[5] --> get_pixel
+    symbols.Define("get_pixel")
+
+    // globals[6] --> width
+    symbols.Define("width")
+
+    // globals[7] --> height
+    symbols.Define("height")
+
+    // globals[8] --> ctx
     symbols.Define("ctx")
 }
 

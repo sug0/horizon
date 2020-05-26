@@ -19,6 +19,7 @@ func Glitch(ctx context.Context, s *script.Script, mat gocv.Mat) (glitched gocv.
         return
     }
     width := int64(mat.Cols())
+    height := int64(mat.Rows())
     glitched = mat.Clone()
     bitmapMat := mat.DataPtrUint8()
     bitmapGlitched := glitched.DataPtrUint8()
@@ -38,17 +39,19 @@ func Glitch(ctx context.Context, s *script.Script, mat gocv.Mat) (glitched gocv.
         &pixel,
         &coords[0],
         &coords[1],
-        &convI64{},
-        &convF64{},
+        &builtinConvI64{},
+        &builtinConvF64{},
+        &builtinGetPixel{
+            bitmap: bitmapMat,
+            width: width,
+            height: height,
+        },
+        &tengo.Int{Value: width},
+        &tengo.Int{Value: height},
         &persistent,
     )
     glitchRoundWait := make(chan error)
     glitchRound := func(i int) {
-        // set pixel value
-        setPixel(&pixel, 0, int64(bitmapMat[i+0]))
-        setPixel(&pixel, 1, int64(bitmapMat[i+1]))
-        setPixel(&pixel, 2, int64(bitmapMat[i+2]))
-
         // run vm
         err = vm.Run()
         if err != nil {
@@ -92,10 +95,10 @@ func Glitch(ctx context.Context, s *script.Script, mat gocv.Mat) (glitched gocv.
     return
 }
 
-func setPixel(pixel *tengo.Array, i int, x int64) {
-    v := pixel.Value[i].(*tengo.Int)
-    v.Value = x
-}
+//func setPixel(pixel *tengo.Array, i int, x int64) {
+//    v := pixel.Value[i].(*tengo.Int)
+//    v.Value = x
+//}
 
 func getPixel(pixel *tengo.Array, i int) int64 {
     v := pixel.Value[i].(*tengo.Int)
